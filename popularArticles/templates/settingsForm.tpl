@@ -22,12 +22,16 @@
 
     {fbvFormArea id="popularArticlesDisplayOptions" title="plugins.generic.popularArticles.settings.title"}
 
-    {fbvFormSection for="mostReadDays"}
-        {fbvElement type="text" label="plugins.generic.popularArticles.settings.days"  placeholder="plugins.generic.popularArticles.settings.days.placeholder"  id="mostReadDays" value=$mostReadDays}
+    {fbvFormSection for="title"}
+    {fbvElement type="text" label="Page title"  placeholder="Page Title"  id="title" value=$title multilingual="true"}
     {/fbvFormSection}
 
-    {fbvFormSection for="mostReadCount"}
-        {fbvElement type="text" label="plugins.generic.popularArticles.settings.count"  placeholder="plugins.generic.popularArticles.settings.count.placeholder"  id="mostReadCount" value=$mostReadCount}
+    {fbvFormSection for="days"}
+    {fbvElement type="text" label="plugins.generic.popularArticles.settings.days"  placeholder="plugins.generic.popularArticles.settings.days.placeholder"  id="days" value=$days}
+    {/fbvFormSection}
+
+    {fbvFormSection for="count"}
+    {fbvElement type="text" label="plugins.generic.popularArticles.settings.count"  placeholder="plugins.generic.popularArticles.settings.count.placeholder"  id="count" value=$count}
     {/fbvFormSection}
 
     {/fbvFormArea}

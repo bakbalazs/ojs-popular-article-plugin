@@ -17,13 +17,23 @@ import('lib.pkp.classes.form.Form');
 
 class PopularArticlesSettingsForm extends Form
 {
+    var $contextId;
 
-    function __construct($plugin)
+//    var $popularArticleId;
+
+    var $plugin;
+
+    function __construct($popularArticlePlugin, $contextId)
     {
-        $this->plugin = $plugin;
-        parent::__construct($plugin->getTemplateResource('settingsForm.tpl'));
-        $this->setData('pluginName', $plugin->getName());
-        
+        parent::__construct($popularArticlePlugin->getTemplateResource('settingsForm.tpl'));
+
+
+        $this->contextId = $contextId;
+        $this->plugin = $popularArticlePlugin;
+//        $this->popularArticleId = $popularArticleId;
+
+        $this->setData('pluginName', $popularArticlePlugin->getName());
+
         $this->addCheck(new FormValidatorPost($this));
         $this->addCheck(new FormValidatorCSRF($this));
     }
@@ -33,14 +43,29 @@ class PopularArticlesSettingsForm extends Form
         $plugin = $this->plugin;
         $context = Request::getContext();
         $contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
-        $this->setData('mostReadDays', $plugin->getSetting($contextId, 'mostReadDays'));
-        $this->setData('mostReadCount', $plugin->getSetting($contextId, 'mostReadCount'));
+        $popularArticlesDAO = DAORegistry::getDAO('PopularArticlesDAO');
+
+//        $this->setData('title', $plugin->getSetting($contextId, 'title'));
+
+        $popularArticle = $popularArticlesDAO->getById($contextId);
+
+        if ($popularArticle) {
+            $this->setData('title', $popularArticle->getTitle(null)); // Localized
+            $this->setData('days', $popularArticle->getDays()); // Localized
+            $this->setData('count', $popularArticle->getCount()); // Localized
+
+
+        }
+
+
+//        $this->setData('mostReadDays', $plugin->getSetting($contextId, 'mostReadDays'));
+//        $this->setData('mostReadCount', $plugin->getSetting($contextId, 'mostReadCount'));
 
     }
 
     function readInputData()
     {
-        $this->readUserVars(array('mostReadDays','mostReadCount'));
+        $this->readUserVars(array('title', 'days', 'count'));
     }
 
     function fetch($request, $template = null, $display = false)
@@ -50,12 +75,29 @@ class PopularArticlesSettingsForm extends Form
 
     function execute()
     {
+        $popularArticlesDAO = DAORegistry::getDAO('PopularArticlesDAO');
+
         $plugin = $this->plugin;
         $context = Request::getContext();
         $contextId = $context ? $context->getId() : CONTEXT_ID_NONE;
 
-        $plugin->updateSetting($contextId, 'mostReadDays', $this->getData('mostReadDays'), 'string');
-        $plugin->updateSetting($contextId, 'mostReadCount', $this->getData('mostReadCount'), 'string');
+        if ($contextId) {
+            $popularArticle = $popularArticlesDAO->getById($contextId);
+        } else {
+            $popularArticle = $popularArticlesDAO->newDataObject();
+            $popularArticle->setContextId($contextId);
+        }
+
+
+        $popularArticle->setTitle($this->getData('title'), null);
+        $popularArticle->setDays($this->getData('days'));
+        $popularArticle->setCount($this->getData('count'));
+
+        if ($contextId) {
+            $popularArticlesDAO->updateObject($popularArticle);
+        } else {
+            $popularArticlesDAO->insertObject($popularArticle);
+        }
 
         # empty current cache
         $cacheManager = CacheManager::getManager();

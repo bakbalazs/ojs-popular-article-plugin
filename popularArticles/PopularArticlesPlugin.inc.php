@@ -15,12 +15,17 @@
 
 import('lib.pkp.classes.plugins.GenericPlugin');
 define('POPULAR_ARTICLES_NMI_TYPE', 'NMI_TYPE_POPULAR_ARTICLES');
-class PopularArticlesPlugin extends GenericPlugin {
+
+class PopularArticlesPlugin extends GenericPlugin
+{
     public function register($category, $path, $mainContextId = NULL)
     {
         $success = parent::register($category, $path);
         if (!Config::getVar('general', 'installed') || defined('RUNNING_UPGRADE')) return $success;
         if ($success && $this->getEnabled()) {
+            import('plugins.generic.popularArticles.classes.PopularArticlesDAO');
+            $popularArticlesDAO = new PopularArticlesDAO();
+            DAORegistry::registerDAO('PopularArticlesDAO', $popularArticlesDAO);
             HookRegistry::register('LoadHandler', array($this, 'loadPageHandler'));
             HookRegistry::register('NavigationMenus::itemTypes', array($this, 'addMenuItemTypes'));
             HookRegistry::register('NavigationMenus::displaySettings', array($this, 'setMenuItemDisplayDetails'));
@@ -75,24 +80,35 @@ class PopularArticlesPlugin extends GenericPlugin {
     function manage($args, $request)
     {
         $this->import('settings/PopularArticlesSettingsForm');
+
         switch ($request->getUserVar('verb')) {
             case 'settings':
-                $settingsForm = new PopularArticlesSettingsForm($this);
+                $context = $request->getContext();
+                $settingsForm = new PopularArticlesSettingsForm($this, $context->getId());
                 $settingsForm->initData();
                 return new JSONMessage(true, $settingsForm->fetch($request));
             case 'save':
-                $settingsForm = new PopularArticlesSettingsForm($this);
+                $context = $request->getContext();
+                $settingsForm = new PopularArticlesSettingsForm($this, $context->getId());
                 $settingsForm->readInputData();
                 if ($settingsForm->validate()) {
+                    // Save the results
                     $settingsForm->execute();
-                    $notificationManager = new NotificationManager();
-                    $notificationManager->createTrivialNotification(
-                        $request->getUser()->getId(),
-                        NOTIFICATION_TYPE_SUCCESS,
-                        array('contents' => __('plugins.popularArticles.settings.saved'))
-                    );
-                    return new JSONMessage(true);
+                    return DAO::getDataChangedEvent();
+                } else {
+                    // Present any errors
+                    return new JSONMessage(true, $settingsForm->fetch($request));
                 }
+//                if ($settingsForm->validate()) {
+//                    $settingsForm->execute();
+//                    $notificationManager = new NotificationManager();
+//                    $notificationManager->createTrivialNotification(
+//                        $request->getUser()->getId(),
+//                        NOTIFICATION_TYPE_SUCCESS,
+//                        array('contents' => __('plugins.popularArticles.settings.saved'))
+//                    );
+//                    return new JSONMessage(true);
+//                }
                 return new JSONMessage(true, $settingsForm->fetch($request));
         }
         return parent::manage($args, $request);
@@ -141,6 +157,11 @@ class PopularArticlesPlugin extends GenericPlugin {
             $rootNode->appendChild($url);
         }
         return false;
+    }
+
+    function getInstallSchemaFile()
+    {
+        return $this->getPluginPath() . '/schema.xml';
     }
 
 }

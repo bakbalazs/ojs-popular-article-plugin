@@ -31,11 +31,24 @@ class PopularArticlesHandler extends Handler
             $cache->flush();
         }
         $resultMetrics = $cache->getContents();
+
+        $popularArticlesDAO = DAORegistry::getDAO('PopularArticlesDAO');
+
+        $popularArticle = $popularArticlesDAO->getById($context->getId());
+
+        $title = $popularArticle->getLocalizedTitle();
+
+        if (empty($title)) {
+            $title = "";
+        }
+
+        $templateMgr->assign('title', $title);
+
         $templateMgr->assign('resultMetrics', $resultMetrics);
 
         $plugin = PluginRegistry::getPlugin('generic', 'populararticlesplugin');
 
-        $mostReadDays = (int)$plugin->getSetting($context->getId(), 'mostReadDays');
+        $mostReadDays = $popularArticle->getDays();
         if (empty($mostReadDays)) {
             $mostReadDays = 30;
         }
@@ -53,8 +66,11 @@ class PopularArticlesHandler extends Handler
         $request = Application::getRequest();
         $context = $request->getContext();
         $plugin = PluginRegistry::getPlugin('generic', 'populararticlesplugin');
+        $popularArticlesDAO = DAORegistry::getDAO('PopularArticlesDAO');
 
-        $mostReadDays = (int)$plugin->getSetting($context->getId(), 'mostReadDays');
+        $popularArticle = $popularArticlesDAO->getById($context->getId());
+
+        $mostReadDays = $popularArticle->getDays();
         if (empty($mostReadDays)) {
             $mostReadDays = 30;
         }
@@ -73,7 +89,8 @@ class PopularArticlesHandler extends Handler
         $column = array(
             STATISTICS_DIMENSION_SUBMISSION_ID,
         );
-        $mostReadCount = (int)$plugin->getSetting($context->getId(), 'mostReadCount');
+
+        $mostReadCount = $popularArticle->getCount();
         if (empty($mostReadCount)) {
             $mostReadCount = 15;
         }

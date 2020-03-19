@@ -13,7 +13,7 @@
 <div class="page page_popularArticles">
     <div class="current_page_title">
         <h3 class="text-center">
-            {translate key="plugins.generic.popularArticles.navMenuItem"}
+            {$title}
         </h3>
     </div>
     <ul class="popular_articles">
