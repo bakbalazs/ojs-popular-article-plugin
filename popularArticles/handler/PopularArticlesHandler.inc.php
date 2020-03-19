@@ -61,11 +61,10 @@ class PopularArticlesHandler extends Handler
 
     function _cacheMiss($cache)
     {
-        $publishedArticleDao = DAORegistry::getDAO('PublishedArticleDAO');
+        $submissionDao = DAORegistry::getDAO('SubmissionDAO');
         $journalDao = DAORegistry::getDAO('JournalDAO');
         $request = Application::getRequest();
         $context = $request->getContext();
-        $plugin = PluginRegistry::getPlugin('generic', 'populararticlesplugin');
         $popularArticlesDAO = DAORegistry::getDAO('PopularArticlesDAO');
 
         $popularArticle = $popularArticlesDAO->getById($context->getId());
@@ -100,7 +99,8 @@ class PopularArticlesHandler extends Handler
         $result = $metricsDao->getMetrics(OJS_METRIC_TYPE_COUNTER, $column, $filter, $orderBy, $dbResultRange);
         foreach ($result as $resultRecord) {
             $submissionId = $resultRecord[STATISTICS_DIMENSION_SUBMISSION_ID];
-            $article = $publishedArticleDao->getById($submissionId);
+            $article = $submissionDao->getById($submissionId);
+
             $journal = $journalDao->getById($article->getJournalId());
             $articles[$submissionId]['journalPath'] = $journal->getPath();
             $articles[$submissionId]['articleId'] = $article->getBestArticleId();

@@ -8,7 +8,7 @@
  * Popular Articles plugin template
  *
  *}
-{include file="frontend/components/header.tpl" }
+{include file="frontend/components/header.tpl" pageTitleTranslated=$title}
 
 <div class="page page_popularArticles">
     <div class="current_page_title">
@@ -17,9 +17,9 @@
         </h3>
     </div>
     <ul class="popular_articles">
-    <div class="popular_articles_number_days">
-        {translate key="plugins.generic.popularArticles.settings.days"}: {$mostReadDays}
-    </div>
+        <div class="popular_articles_number_days">
+            {translate key="plugins.generic.popularArticles.settings.days"}: {$mostReadDays}
+        </div>
         {foreach from=$resultMetrics item=article}
             <li class="popular_article">
                 <div class="popular_article_title"><a

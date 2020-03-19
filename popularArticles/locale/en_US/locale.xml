@@ -22,4 +22,5 @@
     <message key="plugins.generic.popularArticles.settings.days.placeholder">30</message>
     <message key="plugins.generic.popularArticles.settings.count">Number of items</message>
     <message key="plugins.generic.popularArticles.settings.count.placeholder">15</message>
+    <message key="plugins.generic.popularArticles.settings.title">Page Title</message>
 </locale>

@@ -57,7 +57,7 @@ class PopularArticlesPlugin extends GenericPlugin
         return false;
     }
 
-    function getActions($request, $actionArgs)
+    public function getActions($request, $verb)
     {
         $router = $request->getRouter();
         import('lib.pkp.classes.linkAction.request.AjaxModal');
@@ -66,21 +66,20 @@ class PopularArticlesPlugin extends GenericPlugin
                 new LinkAction(
                     'settings',
                     new AjaxModal(
-                        $router->url($request, null, null, 'manage', null, array_merge($actionArgs, array('verb' => 'settings'))),
+                        $router->url($request, null, null, 'manage', null, array('verb' => 'settings', 'plugin' => $this->getName(), 'category' => 'generic')),
                         $this->getDisplayName()
                     ),
                     __('manager.plugins.settings'),
                     null
                 ),
             ) : array(),
-            parent::getActions($request, $actionArgs)
+            parent::getActions($request, $verb)
         );
     }
 
     function manage($args, $request)
     {
         $this->import('settings/PopularArticlesSettingsForm');
-
         switch ($request->getUserVar('verb')) {
             case 'settings':
                 $context = $request->getContext();
@@ -94,22 +93,17 @@ class PopularArticlesPlugin extends GenericPlugin
                 if ($settingsForm->validate()) {
                     // Save the results
                     $settingsForm->execute();
+                    $notificationManager = new NotificationManager();
+                    $notificationManager->createTrivialNotification(
+                        $request->getUser()->getId(),
+                        NOTIFICATION_TYPE_SUCCESS,
+                        array('contents' => __('plugins.popularArticles.settings.saved'))
+                    );
                     return DAO::getDataChangedEvent();
                 } else {
                     // Present any errors
                     return new JSONMessage(true, $settingsForm->fetch($request));
                 }
-//                if ($settingsForm->validate()) {
-//                    $settingsForm->execute();
-//                    $notificationManager = new NotificationManager();
-//                    $notificationManager->createTrivialNotification(
-//                        $request->getUser()->getId(),
-//                        NOTIFICATION_TYPE_SUCCESS,
-//                        array('contents' => __('plugins.popularArticles.settings.saved'))
-//                    );
-//                    return new JSONMessage(true);
-//                }
-                return new JSONMessage(true, $settingsForm->fetch($request));
         }
         return parent::manage($args, $request);
     }
@@ -162,6 +156,10 @@ class PopularArticlesPlugin extends GenericPlugin
     function getInstallSchemaFile()
     {
         return $this->getPluginPath() . '/schema.xml';
+    }
+
+    function getCanDisable() {
+        return false;
     }
 
 }

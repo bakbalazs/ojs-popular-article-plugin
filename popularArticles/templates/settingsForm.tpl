@@ -23,7 +23,7 @@
     {fbvFormArea id="popularArticlesDisplayOptions" title="plugins.generic.popularArticles.settings.title"}
 
     {fbvFormSection for="title"}
-    {fbvElement type="text" label="Page title"  placeholder="Page Title"  id="title" value=$title multilingual="true"}
+    {fbvElement type="text" label="plugins.generic.popularArticles.settings.title" id="title" value=$title multilingual="true"}
     {/fbvFormSection}
 
     {fbvFormSection for="days"}
