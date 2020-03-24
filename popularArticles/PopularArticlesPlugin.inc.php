@@ -115,7 +115,7 @@ class PopularArticlesPlugin extends GenericPlugin
         $context = $request->getContext();
 
         $types
-        [MOST_READ_ARTICLE_NMI_TYPE] = array(
+        [POPULAR_ARTICLES_NMI_TYPE] = array(
             'title' => __('plugins.generic.popularArticles.navMenuItem'),
             'description' => __('plugins.generic.popularArticles.navMenuItem.description'),
 
@@ -125,8 +125,8 @@ class PopularArticlesPlugin extends GenericPlugin
     public function setMenuItemDisplayDetails($hookName, $args)
     {
         $navigationMenuItem =& $args[0];
-        $typePrefixLength = strlen(MOST_READ_ARTICLE_NMI_TYPE);
-        if (substr($navigationMenuItem->getType(), 0, $typePrefixLength) === MOST_READ_ARTICLE_NMI_TYPE) {
+        $typePrefixLength = strlen(POPULAR_ARTICLES_NMI_TYPE);
+        if (substr($navigationMenuItem->getType(), 0, $typePrefixLength) === POPULAR_ARTICLES_NMI_TYPE) {
             $request = Application::getRequest();
             $dispatcher = $request->getDispatcher();
             $navigationMenuItem->setUrl($dispatcher->url(
