@@ -111,8 +111,6 @@ class PopularArticlesPlugin extends GenericPlugin
     public function addMenuItemTypes($hookName, $args)
     {
         $types =& $args[0];
-        $request = Application::getRequest();
-        $context = $request->getContext();
 
         $types
         [POPULAR_ARTICLES_NMI_TYPE] = array(
@@ -156,10 +154,6 @@ class PopularArticlesPlugin extends GenericPlugin
     function getInstallSchemaFile()
     {
         return $this->getPluginPath() . '/schema.xml';
-    }
-
-    function getCanDisable() {
-        return false;
     }
 
 }
